@@ -1,0 +1,34 @@
+# 清除环境中的所有对象
+rm(list=ls())
+
+# 设置选项，使得读取的字符串不会被转换为因子类型
+options(stringsAsFactors=F)
+
+# 加载所需的R包
+library(Seurat)
+library(dplyr)
+library(data.table)
+library(stringr)
+
+# 读取10X数据并创建Seurat对象
+"sce<-CreateSeuratObject(counts=Read10X(""C:/Users/86152/Desktop/GSE135710""),"
+"                          min.cells=5,"
+                          min.features=300)
+
+# 查看Seurat对象的行名
+head(rownames(sce@meta.data))
+
+# 查看orig.ident的唯一值
+unique(sce@meta.data$orig.ident)
+
+# 使用str_split函数分割行名，并提取分组信息
+"phe<-str_split(rownames(sce@meta.data),'-',simplify=T)"
+"sce@meta.data$orig.ident<-paste0('p',phe[,2])"
+
+# 查看更新后的orig.ident的唯一值
+unique(sce@meta.data$orig.ident)
+
+# 统计每个样本的细胞数量
+table(sce@meta.data$orig.ident)
+
+data=sce
