@@ -1,0 +1,28 @@
+# 清除环境中的所有对象
+rm(list = ls())
+
+# 设置选项，使得读取的字符串不会被转换为因子类型
+options(stringsAsFactors = F)
+
+# 加载SeuratDisk包和patchwork包
+library(SeuratDisk)
+library(patchwork)
+
+# 获取当前工作目录
+getwd()
+"setwd(""C:/Users/86152/Desktop/GSE153643"")"
+#～～～～开始读数据～～～～～
+# h5ad是python的Scanpy读取文件格式，需要转换
+#～～～～读取adipose～～～～
+
+# 将h5ad文件转换为Seurat兼容的h5seurat格式
+"Convert('C:/Users/86152/Desktop/GSE153643/GSM4648565_liver_raw_counts.h5ad', ""h5seurat"","
+"        overwrite = TRUE, assay = ""RNA"")"
+
+# 加载转换后的h5seurat文件
+"scRNA <- LoadH5Seurat(""C:/Users/86152/Desktop/GSE153643/GSM4648565_liver_raw_counts.h5seurat"")"
+
+# 打印scRNA对象，此时scRNA是一个标准的Seurat对象
+scRNA
+
+data=scRNA

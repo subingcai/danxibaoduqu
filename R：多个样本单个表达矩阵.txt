@@ -1,0 +1,31 @@
+# 清除环境中的所有对象
+rm(list = ls())
+
+# 设置选项，使得读取的字符串不会被转换为因子类型
+options(stringsAsFactors = F)
+
+# 加载所需的R包
+library(Seurat)
+library(dplyr)
+# 设置工作目录到GSE149614文件夹
+"setwd(""C:/Users/86152/Desktop/GSE185856"")"
+
+# 加载data.table包，用于读取大型数据文件
+library(data.table)
+
+"# 使用data.table包的fread函数读取.gz格式的计数文件,下面名称要带.gz"
+"ct <- fread('GSM5624813_L_GY004086_trimmed_star_Aligned_counts.txt.gz', data.table = F)"
+
+# 打印读取数据的前4行和前4列
+"print(ct[1:4, 1:4])"
+
+# 设置行名为第一列的值，这些通常是基因标识符
+"rownames(ct) <- ct[, 1]"
+
+# 删除第一列，因为它已经被设置为行名
+"ct <- ct[, -1]"
+
+# 创建Seurat对象，使用读取的计数数据
+sce.all <- CreateSeuratObject(counts = ct)
+
+data=sce.all

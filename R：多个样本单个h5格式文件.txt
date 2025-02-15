@@ -1,0 +1,22 @@
+# 清除环境中的所有对象
+rm(list = ls())
+
+# 加载Seurat和dplyr包
+library(Seurat)
+library(dplyr)
+
+# 设置选项，使得读取的字符串不会被转换为因子类型
+options(stringsAsFactors = F)
+
+# 获取当前工作目录
+getwd()
+setwd('C:/Users/86152/Desktop/GSE171993')
+
+# 参考链接：https://mp.weixin.qq.com/s/tw7lygmGDAbpzMTx57VvFw
+# 读取.h5格式的单细胞数据文件
+"ct = Read10X_h5(""C:/Users/86152/Desktop/GSE171993/GSE171993_filtered_feature_bc_matrix.h5"")"
+
+# 使用读取的数据创建Seurat对象
+sce.all = CreateSeuratObject(counts = ct)
+
+data=sce.all

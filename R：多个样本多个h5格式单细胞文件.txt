@@ -1,0 +1,53 @@
+# 清除环境中的所有对象
+rm(list = ls())
+
+# 设置选项，使得读取的字符串不会被转换为因子类型
+options(stringsAsFactors = F)
+
+# 加载所需的R包
+library(dplyr)
+library(Seurat)
+library(data.table)
+
+# 获取当前工作目录
+getwd()
+"setwd(""C:/Users/86152/Desktop/GSE168215"")"
+# 定义数据目录路径
+dir = 'C:/Users/86152/Desktop/GSE168215'
+# 列出目录中的所有文件
+samples = list.files(dir)
+print(samples) # 打印样本文件名
+
+# 初始化一个空列表来存储Seurat对象
+"sceList = lapply(samples, function(pro) {"
+  print(pro) # 打印当前处理的样本名称
+  # 使用Read10X_h5函数读取.h5文件
+"  tmp = Read10X_h5(file.path(dir, pro))"
+  # 如果返回两个对象（细胞和特征），则使用第一个
+  if(length(tmp) == 2) {
+    ct = tmp[[1]]
+  } else {
+    ct = tmp
+  }
+  # 打印读取数据的前10行和前2列
+"  print(ct[1:10, 1:2])"
+  # 打印读取数据的最后几行的前2列
+"  print(tail(ct[, 1:2]))"
+  # 清理基因名称，去除不需要的前缀
+"  rownames(ct) = gsub('GRCh38______','', rownames(ct))"
+  # 创建Seurat对象
+"  sce = CreateSeuratObject(counts = ct,"
+"                           project = gsub('_filtered_feature_bc_matrix.h5','', pro),"
+"                           min.cells = 5,"
+                           min.features = 300) 
+  return(sce)
+})
+
+# 打印每个Seurat对象的维度信息
+"do.call(rbind, lapply(sceList, dim))"
+
+# 合并所有样本的Seurat对象
+"sce.all = merge(x = sceList[[1]],"
+"                y = sceList[-1],"
+                add.cell.ids = samples)
+data=sce.all

@@ -1,0 +1,61 @@
+# 清除环境中的所有对象
+rm(list = ls())
+
+# 设置选项，使得读取的字符串不会被转换为因子类型
+options(stringsAsFactors = F)
+
+# 加载所需的R包
+library(Seurat)
+library(dplyr)
+library(data.table)
+
+# 设置工作目录
+"setwd(""C:/Users/86152/Desktop/"") # 请替换为实际的工作目录路径"
+
+# 定义数据目录路径
+dir = 'C:/Users/86152/Desktop/GSE167297'
+
+# 列出目录中所有.gz文件
+"samples = list.files(dir, pattern = 'gz')"
+print(samples) # 打印样本文件名
+
+# 初始化一个空列表来存储表达矩阵
+"ctList = lapply(samples, function(pro) {"
+  print(pro) # 打印当前处理的文件名
+  
+  # 使用fread函数读取.gz文件
+"  ct = fread(file.path(dir, pro), data.table = F)"
+  
+  # 打印读取数据的前4行和前4列
+"  print(ct[1:4, 1:4])"
+  
+  # 设置行名为第一列的值
+"  rownames(ct) = ct[, 1]"
+  
+  # 设置列名为文件名（去除.txt.gz后缀）加上原始列名
+"  colnames(ct) = paste(gsub('.txt.gz', '', pro), colnames(ct), sep = '_')"
+  
+  # 删除第一列
+"  ct = ct[, -1]"
+  
+  return(ct)
+})
+
+# 打印每个表达矩阵的维度，这步到下面创建Seurat对象前可以不跑
+"lapply(ctList, dim)"
+
+# 统计每个基因在所有样本中的出现次数
+"tmp = table(unlist(lapply(ctList, rownames)))"
+cg = names(tmp)[tmp == length(samples)] # 找出在所有样本中都出现的基因
+
+# 合并所有样本的表达矩阵，只保留在所有样本中都出现的基因
+"bigct = do.call(cbind, lapply(ctList, function(ct) {"
+"  ct = ct[cg, ] # 只保留共同的基因"
+  return(ct)
+}))
+
+# 创建Seurat对象
+"sce.all = CreateSeuratObject(counts = bigct,"
+"                             min.cells = 5,"
+                             min.features = 300)
+data=sce.all
